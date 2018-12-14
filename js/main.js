@@ -18,6 +18,18 @@
         this.html.on("click", this.clickHandler);
     };
 
+    function Popup(params) {
+        this.title = params.title;
+        this.model = params.model;
+        this.customCssClass = params.customCssClass;
+        this.createHtml();
+    };
+
+    function Form(params) {
+        this.model = params;
+        this.create();
+    }
+
     Button.prototype.draw = function() {
         return this.html;
     }
@@ -88,6 +100,54 @@
     }
 
 
+    
+
+    Popup.prototype.show = function() {
+        $("body").append(this.popup);
+        this.popup.show();
+    }
+
+    Popup.prototype.createHtml = function() {
+        var content = new Form(this.model);
+        var popup = $("<div />", {
+            class: "popup"
+        });
+        popup.append(content.getContent());
+        this.popup = popup;
+    }
+
+    Form.FieldTypes = {
+        input: "input",
+        select: "select"
+    }
+
+    Form.prototype.create = function() {
+        var form = $("<form />", {
+            class: "popup__form"
+        });
+        this.model.fields.forEach((field) => {
+            var fieldDOM;
+            if(field.type == Form.FieldTypes.input) {
+                fieldDOM = $("<input />", {
+                    class: "popup__form-input"
+                });
+                form.append(field);
+            }
+        });
+        this.form = form;
+    }
+
+    Form.getFieldTypes = function() {
+        return this.FieldTypes;
+    }
+
+    Form.prototype.getContent = function() {
+        return this.form;
+    }
+
+
+
+
 
 
 
@@ -115,21 +175,37 @@
         addEventListeners: function() {
         },
         showCreateNewTaskPopup: function() {
-            var content = $("<div />", {
-                class: "task-list_new-task"
-            });
-            var nameInput = $("<input />", {
-                class: "new-task_name-input jsCreateNewTaskName"
-            });
-            var createButton = $("<input />", {
-                class: "new-task_submit-button",
-                value: "Create",
-                type: "Button"
-            });
-            createButton.on("click", this.createNewTask.bind(this));
-            content.append(nameInput);
-            content.append(createButton);
-            this.openPopup(content);
+            // var nameInput = $("<input />", {
+            //     class: "new-task_name-input jsCreateNewTaskName"
+            // });
+            // var createButton = $("<input />", {
+            //     class: "new-task_submit-button",
+            //     value: "Create",
+            //     type: "Button"
+            // });
+
+            var model = {
+                model: {
+                    customCssClass: "task-list_new-task",
+                    fields: [
+                        {
+                            type: Form.getFieldTypes().input
+                        }
+                    ]
+                }                
+            }
+
+            var popup = new Popup(model);
+            popup.show();
+
+
+
+
+
+            // createButton.on("click", this.createNewTask.bind(this));
+            // content.append(nameInput);
+            // content.append(createButton);
+            //this.openPopup(content);
         },
         createNewTask: function() {
             var task = new Task({
